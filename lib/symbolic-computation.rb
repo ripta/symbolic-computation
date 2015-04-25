@@ -40,14 +40,17 @@ module SymbolicComputation
     def self.class(*ivars, &blk)
       klass = Class.new(Basic) do
 
+        # def klass.abstract
         self.class.send(:define_method, :abstract) do
           self
         end
 
+        # def klass.implement
         self.class.send(:define_method, :implement) do
           Class.new(self)
         end
 
+        # def call(*vars)
         if ivars.size == 1
           define_method(:call) do |*vars|
             case instance_variable_get("@#{ivars.first}")
@@ -63,12 +66,14 @@ module SymbolicComputation
           end
         end
 
+        # def initialize(*_)
         define_method(:initialize) do |*_|
           ivars.each_with_index do |ivar, idx|
             instance_variable_set("@#{ivar}", _[idx])
           end
         end
 
+        # def inspect
         define_method(:inspect) do
           inspected_ivars = ivars.map { |ivar| instance_variable_get("@#{ivar}").inspect }.join(', ')
           "#{self.class.name.split(/::/).last}(#{inspected_ivars})"
