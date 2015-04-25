@@ -4,36 +4,40 @@ module SymbolicComputation
   class Generator
 
     Basic = Class.new do
-      self.class.send(:define_method, :coerces) do |*target_klasses|
-        coercion_klass = self
-        # coerce(other) is defined on subclasses
-        Basic.send(:define_method, :coerce) do |other|
-          case other
-          when *target_klasses
-            # begin
-              [coercion_klass.new(other), self]
-              # [Value.new(other), self]
-            # rescue => e
-            #   puts "Coercion error: #{e.message}: #{e.backtrace.join("\n")}"
-            #   raise e
-            # end
-          else
-            raise TypeError, "#{self.class.name} cannot be coerced into #{other.class.name}!"
-          end
-        end
-        self
-      end
+      class <<self
 
-      self.class.send(:define_method, :op) do |op|
-        op_klass = self
-        if Basic.instance_methods.include?(op)
-          raise ArgumentError, "Cannot allow #{op_klass} to operate on #{op.inspect}, because it is already claimed"
+        define_method(:coerces) do |*target_klasses|
+          coercion_klass = self
+          # coerce(other) is defined on subclasses
+          Basic.send(:define_method, :coerce) do |other|
+            case other
+            when *target_klasses
+              # begin
+                [coercion_klass.new(other), self]
+                # [Value.new(other), self]
+              # rescue => e
+              #   puts "Coercion error: #{e.message}: #{e.backtrace.join("\n")}"
+              #   raise e
+              # end
+            else
+              raise TypeError, "#{self.class.name} cannot be coerced into #{other.class.name}!"
+            end
+          end
+          self
         end
-        Basic.send(:define_method, op) do |*others|
-          # puts "#{self.class} #{op_klass} #{others.first.inspect}"
-          op_klass.new(self, *others)
+
+        define_method(:op) do |op|
+          op_klass = self
+          if Basic.instance_methods.include?(op)
+            raise ArgumentError, "Cannot allow #{op_klass} to operate on #{op.inspect}, because it is already claimed"
+          end
+          Basic.send(:define_method, op) do |*others|
+            # puts "#{self.class} #{op_klass} #{others.first.inspect}"
+            op_klass.new(self, *others)
+          end
+          self
         end
-        self
+
       end
     end
 
