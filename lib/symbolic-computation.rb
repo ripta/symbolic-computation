@@ -42,14 +42,18 @@ module SymbolicComputation
 
         attr_reader *ivars
 
-        # def klass.abstract
-        self.class.send(:define_method, :abstract) do
-          self
-        end
+        class <<self
 
-        # def klass.implement
-        self.class.send(:define_method, :implement) do
-          Class.new(self)
+          # def klass.abstract
+          define_method(:abstract) do
+            self
+          end
+
+          # def klass.implement
+          define_method(:implement) do
+            Class.new(self)
+          end
+
         end
 
         # def call(*vars)
