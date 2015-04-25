@@ -41,24 +41,25 @@ module SymbolicComputation
       end
     end
 
+    MetaClassMethods = Module.new do
+
+      # def klass.abstract
+      define_method(:abstract) do
+        self
+      end
+
+      # def klass.implement
+      define_method(:implement) do
+        Class.new(self)
+      end
+
+    end
+
     def self.class(*ivars, &blk)
       klass = Class.new(Basic) do
+        extend MetaClassMethods
 
         attr_reader *ivars
-
-        class <<self
-
-          # def klass.abstract
-          define_method(:abstract) do
-            self
-          end
-
-          # def klass.implement
-          define_method(:implement) do
-            Class.new(self)
-          end
-
-        end
 
         # def call(*vars)
         if ivars.size == 1
@@ -125,3 +126,4 @@ end
 def Parse(&blk)
   SymbolicComputation::Builder.instance_eval(&blk)
 end
+
