@@ -81,7 +81,7 @@ module SymbolicComputation
 
         # def inspect
         define_method(:inspect) do
-          inspected_ivars = ivars.map { |ivar| instance_variable_get("@#{ivar}").inspect }.join(', ')
+          inspected_ivars = ivars.map { |ivar| __send__(ivar).inspect }.join(', ')
           "#{self.class.name.split(/::/).last}(#{inspected_ivars})"
         end
 
