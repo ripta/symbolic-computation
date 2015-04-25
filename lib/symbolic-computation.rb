@@ -40,6 +40,8 @@ module SymbolicComputation
     def self.class(*ivars, &blk)
       klass = Class.new(Basic) do
 
+        attr_reader *ivars
+
         # def klass.abstract
         self.class.send(:define_method, :abstract) do
           self
@@ -77,10 +79,6 @@ module SymbolicComputation
         define_method(:inspect) do
           inspected_ivars = ivars.map { |ivar| instance_variable_get("@#{ivar}").inspect }.join(', ')
           "#{self.class.name.split(/::/).last}(#{inspected_ivars})"
-        end
-
-        ivars.each do |ivar|
-          define_method(ivar) { instance_variable_get("@#{ivar}") }
         end
 
       end
