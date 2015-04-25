@@ -20,12 +20,15 @@ module SymbolicComputation
 
     Basic = Class.new do
       self.class.send(:define_method, :coerces) do |*target_klasses|
-        define_method(:coerce) do |other|
+        coercion_klass = self
+        # coerce(other) is defined on subclasses
+        Basic.send(:define_method, :coerce) do |other|
           # puts "#{self}#coerce(#{other})"
           case other
           when *target_klasses
             # begin
-              [self.class.new(other), self]
+              [coercion_klass.new(other), self]
+              # [Value.new(other), self]
             # rescue => e
             #   puts "Coercion error: #{e.message}: #{e.backtrace.join("\n")}"
             #   raise e
@@ -37,10 +40,14 @@ module SymbolicComputation
         self
       end
 
-      self.class.send(:define_method, :handles) do |op|
+      self.class.send(:define_method, :op) do |op|
         op_klass = self
+        if Basic.instance_methods.include?(op)
+          raise ArgumentError, "Cannot allow #{op_klass} to operate on #{op.inspect}, because it is already claimed"
+        end
         Basic.send(:define_method, op) do |*others|
-          puts "#{self.class}, #{op_klass}, #{others.inspect}"
+          # puts "#{self.class}, #{op_klass}, #{others.inspect}"
+          # puts "#{self.class} #{op_klass} #{others.first.inspect}"
           op_klass.new(self, *others)
         end
         self
@@ -49,6 +56,14 @@ module SymbolicComputation
 
     def self.class(*ivars, &blk)
       klass = Class.new(Basic) do
+
+        self.class.send(:define_method, :abstract) do
+          self
+        end
+
+        self.class.send(:define_method, :implement) do
+          Class.new(self)
+        end
 
         if ivars.size == 1
           define_method(:call) do |*vars|
@@ -102,12 +117,14 @@ module SymbolicComputation
 
   Expression = Generator.class(:_)
 
-  BinaryOp = Generator.class(:_1, :_2)
-  Add = Class.new(BinaryOp).handles(:+)
-  Subtract = Class.new(BinaryOp).handles(:-)
+  BinaryOp = Generator.class(:_1, :_2).abstract
+    Add = BinaryOp.implement.op(:+)
+    Subtract = BinaryOp.implement.op(:-)
+    Multiply = BinaryOp.implement.op(:*)
+    Divide = BinaryOp.implement.op(:/)
 
-  Value = Generator.class(:_)#boxes(Numeric)
-  Variable = Generator.class(:_).coerces(Numeric)
+  Value = Generator.class(:_).coerces(Numeric)
+  Variable = Generator.class(:_)
 
 end
 
