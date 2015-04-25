@@ -36,6 +36,15 @@ module SymbolicComputation
         end
         self
       end
+
+      self.class.send(:define_method, :handles) do |op|
+        op_klass = self
+        Basic.send(:define_method, op) do |*others|
+          puts "#{self.class}, #{op_klass}, #{others.inspect}"
+          op_klass.new(self, *others)
+        end
+        self
+      end
     end
 
     def self.class(*ivars, &blk)
@@ -94,8 +103,8 @@ module SymbolicComputation
   Expression = Generator.class(:_)
 
   BinaryOp = Generator.class(:_1, :_2)
-  Add = Class.new(BinaryOp)#.handles(:+)
-  Subtract = Class.new(BinaryOp)
+  Add = Class.new(BinaryOp).handles(:+)
+  Subtract = Class.new(BinaryOp).handles(:-)
 
   Value = Generator.class(:_)#boxes(Numeric)
   Variable = Generator.class(:_).coerces(Numeric)
