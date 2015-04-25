@@ -1,19 +1,4 @@
 
-# class Numeric
-#   def _
-#     self
-#   end
-
-#   # def +(other)
-#   #   case other
-#   #   when Numeric
-#   #     super
-#   #   else
-#   #     _
-#   #   end
-#   # end
-# end
-
 module SymbolicComputation
 
   class Generator
@@ -23,7 +8,6 @@ module SymbolicComputation
         coercion_klass = self
         # coerce(other) is defined on subclasses
         Basic.send(:define_method, :coerce) do |other|
-          # puts "#{self}#coerce(#{other})"
           case other
           when *target_klasses
             # begin
@@ -46,7 +30,6 @@ module SymbolicComputation
           raise ArgumentError, "Cannot allow #{op_klass} to operate on #{op.inspect}, because it is already claimed"
         end
         Basic.send(:define_method, op) do |*others|
-          # puts "#{self.class}, #{op_klass}, #{others.inspect}"
           # puts "#{self.class} #{op_klass} #{others.first.inspect}"
           op_klass.new(self, *others)
         end
