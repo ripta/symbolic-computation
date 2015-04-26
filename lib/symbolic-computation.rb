@@ -27,16 +27,26 @@ module SymbolicComputation
       end
     end
 
+    def match(*types, &blk)
+      set(types, 0.upto(types.size - 1).to_a, blk)
+    end
+
     def permute(*types, &blk)
       idx_orders = 0.upto(types.size - 1).to_a.permutation(types.size)
       idx_orders.each do |idx_order|
         type_order = idx_order.map { |idx| types[idx] }
-        if rules.key?(type_order)
-          warn "Redefining simplification rule for #{types.inspect}."
-        end
-        rules[type_order] = Rule.new(idx_order, blk)
+        set(type_order, idx_order, blk)
       end
       self
+    end
+
+    private
+
+    def set(type_order, idx_order, blk)
+      if rules.key?(type_order)
+        warn "Redefining simplification rule for #{types.inspect}."
+      end
+      rules[type_order] = Rule.new(idx_order, blk)
     end
 
   end
