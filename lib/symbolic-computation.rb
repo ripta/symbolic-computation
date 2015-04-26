@@ -177,11 +177,18 @@ module SymbolicComputation
     end
   end
 
+end
+
+module SymbolicComputation
+
   Expression = Generator.class(:_)
 
   Value = Generator.class(:_).coerces(Numeric)
   Variable = Generator.class(:_)
   Operand = Generator.class(:coef, :var)
+
+  UnaryOp = Generator.class(:_1).abstract
+    UnaryMinus = UnaryOp.implement.op(:-@)
 
   BinaryOp = Generator.class(:_1, :_2).abstract
     Add = BinaryOp.implement.op(:+)
