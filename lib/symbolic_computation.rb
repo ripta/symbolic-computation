@@ -1,4 +1,3 @@
-
 module SymbolicComputation
 
   class Simplifier
@@ -21,8 +20,10 @@ module SymbolicComputation
 
       typeset = rules.keys.find { |types| values.zip(types).all? { |value, type| value.kind_of?(type) } }
       if typeset.nil?
+        # puts "TS_XX: #{values.size}##{values.inspect} => nil (options were #{rules.keys.inspect})"
         nil
       else
+        # puts "TS_OK: #{values.inspect} => #{typeset.inspect}"
         rules[typeset].execute(values)
       end
     end
@@ -179,10 +180,15 @@ end
 
 module SymbolicComputation
 
+  Any = Generator.basic
   Expression = Generator.class(:_)
 
   Value = Generator.class(:_) do
     coerces Numeric
+
+    def -@
+      self.class.new(-self._)
+    end
 
     def +(other)
       if self.class === other
@@ -197,7 +203,11 @@ module SymbolicComputation
       super
     end
   end
-  Variable = Generator.class(:_)
+  Variable = Generator.class(:_) do
+    def -@
+      -1 * self
+    end
+  end
   Operand = Generator.class(:coef, :var) do
     simplify {
       on(Value, Variable) { |val, var|
@@ -210,6 +220,10 @@ module SymbolicComputation
         end
       }
     }
+
+    def -@
+      self.class.new(-coef, var)
+    end
 
     def +(other)
       if self.class === other && var == other.var
@@ -229,7 +243,7 @@ module SymbolicComputation
   end
 
   UnaryOp = Generator.class(:_1).abstract
-    UnaryMinus = UnaryOp.implement.op(:-@)
+    # UnaryMinus = UnaryOp.implement.op(:-@)
 
   BinaryOp = Generator.class(:_1, :_2).abstract
     Add = BinaryOp.implement do
