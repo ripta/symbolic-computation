@@ -1,6 +1,46 @@
 
 module SymbolicComputation
 
+  class Simplifier
+
+    Rule = Struct.new(:idx_orders, :logic) do
+      def execute(values)
+        reordered_values = idx_orders.map { |idx| values[idx] }
+        logic.(*reordered_values).tap { |v| puts v.inspect }
+      end
+    end
+
+    attr_reader :rules
+
+    def initialize
+      @rules = {}
+    end
+
+    def execute(values)
+      return if rules.empty?
+
+      typeset = rules.keys.find { |types| values.zip(types).all? { |value, type| value.kind_of?(type) } }
+      if typeset.nil?
+        nil
+      else
+        rules[typeset].execute(values)
+      end
+    end
+
+    def permute(*types, &blk)
+      idx_orders = 0.upto(types.size - 1).to_a.permutation(types.size)
+      idx_orders.each do |idx_order|
+        type_order = idx_order.map { |idx| types[idx] }
+        if rules.key?(type_order)
+          warn "Redefining simplification rule for #{types.inspect}."
+        end
+        rules[type_order] = Rule.new(idx_order, blk)
+      end
+      self
+    end
+
+  end
+
   class Generator
 
     Basic = Class.new do
@@ -36,6 +76,11 @@ module SymbolicComputation
             op_klass.new(self, *others)
           end
           self
+        end
+
+        define_method(:simplify) do |&blk|
+          @__simplifier__ ||= Simplifier.new
+          blk.nil? ? @__simplifier__ : @__simplifier__.instance_eval(&blk)
         end
 
       end
@@ -90,6 +135,18 @@ module SymbolicComputation
           "#{self.class.name.split(/::/).last}(#{inspected_ivars})"
         end
 
+        define_method(:simplify) do
+          ivar_simplifieds = ivars.map do |ivar|
+            val = __send__(ivar)
+            val.respond_to?(:simplify) ? val.simplify : val
+          end
+          # simple = self.class.simplify.execute(ivar_simplifieds)
+          # if simple
+          # else
+          # end
+          self.class.simplify.execute(ivar_simplifieds) || self.class.new(*ivar_simplifieds)
+        end
+
       end
 
       klass.class_eval(&blk) unless blk.nil?
@@ -112,14 +169,19 @@ module SymbolicComputation
 
   Expression = Generator.class(:_)
 
+  Value = Generator.class(:_).coerces(Numeric)
+  Variable = Generator.class(:_)
+  Operand = Generator.class(:coef, :var)
+
   BinaryOp = Generator.class(:_1, :_2).abstract
     Add = BinaryOp.implement.op(:+)
     Subtract = BinaryOp.implement.op(:-)
     Multiply = BinaryOp.implement.op(:*)
+      Multiply.simplify do
+        permute(Numeric, Variable) { |coef, var| Operand.new(Value.new(coef), var) }
+        permute(Value, Variable)   { |coef, var| Operand.new(coef, var) }
+      end
     Divide = BinaryOp.implement.op(:/)
-
-  Value = Generator.class(:_).coerces(Numeric)
-  Variable = Generator.class(:_)
 
 end
 
