@@ -59,17 +59,10 @@ module SymbolicComputation
 
         define_method(:coerces) do |*target_klasses|
           coercion_klass = self
-          # coerce(other) is defined on subclasses
           Basic.send(:define_method, :coerce) do |other|
             case other
             when *target_klasses
-              # begin
-                [coercion_klass.new(other), self]
-                # [Value.new(other), self]
-              # rescue => e
-              #   puts "Coercion error: #{e.message}: #{e.backtrace.join("\n")}"
-              #   raise e
-              # end
+              [coercion_klass.new(other), self]
             else
               raise TypeError, "#{self.class.name} cannot be coerced into #{other.class.name}!"
             end
