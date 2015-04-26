@@ -273,8 +273,8 @@ def Parse(&blk)
   SymbolicComputation::Builder.instance_eval(&blk)
 end
 
-def Simplify(expr, max_depth = 500)
+def Simplify(expr, max_depth: 500)
   return expr if max_depth <= 0
   simple = expr.simplify
-  simple == expr ? simple : Simplify(simple, max_depth - 1)
+  simple == expr ? simple : Simplify(simple, max_depth: max_depth - 1)
 end
