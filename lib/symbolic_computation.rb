@@ -199,15 +199,7 @@ module SymbolicComputation
   end
   Variable = Generator.class(:_)
   Operand = Generator.class(:coef, :var) do
-    def +(other)
-      if self.class === other && self.var == other.var
-        self.class.new(self.coef + other.coef, self.var)
-      else
-        super
-      end
-    end
-  end
-    Operand.simplify {
+    simplify {
       on(Value, Variable) { |val, var|
         if val == 0
           val
@@ -218,6 +210,23 @@ module SymbolicComputation
         end
       }
     }
+
+    def +(other)
+      if self.class === other && var == other.var
+        self.class.new(coef + other.coef, var)
+      else
+        super
+      end
+    end
+
+    def pred
+      self.class.new(coef + Value.new(-1), var)
+    end
+
+    def succ
+      self.class.new(coef + Value.new(1), var)
+    end
+  end
 
   UnaryOp = Generator.class(:_1).abstract
     UnaryMinus = UnaryOp.implement.op(:-@)
