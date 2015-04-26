@@ -82,6 +82,7 @@ module SymbolicComputation
             raise ArgumentError, "Cannot allow #{op_klass} to operate on #{op.inspect}, because it is already claimed"
           end
           Basic.send(:define_method, op) do |*others|
+            puts "Basic##{op}"
             # puts "#{self.class} #{op_klass} #{others.first.inspect}"
             op_klass.new(self, *others)
           end
@@ -116,19 +117,13 @@ module SymbolicComputation
 
         attr_reader *ivars
 
-        # def call(*vars)
-        if ivars.size == 1
-          define_method(:call) do |*vars|
-            case instance_variable_get("@#{ivars.first}")
-            when self.class
-              instance_variable_get("@#{ivars.first}").(*vars)
-            else
-              self
-            end
-          end
-        else
-          define_method(:call) do |*vars|
-            self
+        # def ==(other)
+        define_method(:==) do |other|
+          if self.class == other.class
+            # ivars.map { |ivar| send(ivar) } == ivars.map { |ivar| other.send(ivar) }
+            ivars.all? { |ivar| send(ivar) == other.send(ivar) }
+          else
+            false
           end
         end
 
@@ -150,17 +145,16 @@ module SymbolicComputation
             val = __send__(ivar)
             val.respond_to?(:simplify) ? val.simplify : val
           end
-          # simple = self.class.simplify.execute(ivar_simplifieds)
-          # if simple
-          # else
-          # end
           self.class.simplify.execute(ivar_simplifieds) || self.class.new(*ivar_simplifieds)
         end
 
       end
 
-      klass.class_eval(&blk) unless blk.nil?
-      klass
+      if blk.nil?
+        klass
+      else
+        Class.new(klass).tap { |k| k.class_eval(&blk) }
+      end
     end
 
   end
@@ -183,7 +177,16 @@ module SymbolicComputation
 
   Expression = Generator.class(:_)
 
-  Value = Generator.class(:_).coerces(Numeric)
+  Value = Generator.class(:_) do
+    coerces Numeric
+    def +(other)
+      if self.class === other
+        self.class.new(self._ + other._)
+      else
+        super
+      end
+    end
+  end
   Variable = Generator.class(:_)
   Operand = Generator.class(:coef, :var)
 
@@ -192,6 +195,11 @@ module SymbolicComputation
 
   BinaryOp = Generator.class(:_1, :_2).abstract
     Add = BinaryOp.implement.op(:+)
+      Add.simplify {
+        on(Operand, Operand) { |o1, o2| Operand.new(o1.coef + o2.coef, o1.var) if o1.var == o2.var }
+        on(Variable, Variable) { |v1, v2| 2 * v1 if v1 == v2 }
+        on_any_order(Operand, Variable) { |o, v| Operand.new(o.coef + Value.new(1), o.var) if o.var == v }
+      }
     Subtract = BinaryOp.implement.op(:-)
     Multiply = BinaryOp.implement.op(:*)
       Multiply.simplify {
@@ -206,3 +214,8 @@ def Parse(&blk)
   SymbolicComputation::Builder.instance_eval(&blk)
 end
 
+def Simplify(expr, max_depth = 500)
+  return expr if max_depth <= 0
+  simple = expr.simplify
+  simple == expr ? simple : Simplify(simple, max_depth - 1)
+end
