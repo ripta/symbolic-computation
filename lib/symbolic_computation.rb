@@ -6,7 +6,7 @@ module SymbolicComputation
     Rule = Struct.new(:idx_orders, :logic) do
       def execute(values)
         reordered_values = idx_orders.map { |idx| values[idx] }
-        logic.(*reordered_values).tap { |v| puts v.inspect }
+        logic.(*reordered_values) #.tap { |v| puts v.inspect }
       end
     end
 
@@ -82,7 +82,7 @@ module SymbolicComputation
             raise ArgumentError, "Cannot allow #{op_klass} to operate on #{op.inspect}, because it is already claimed"
           end
           Basic.send(:define_method, op) do |*others|
-            puts "Basic##{op}"
+            #puts "Basic##{op}"
             # puts "#{self.class} #{op_klass} #{others.first.inspect}"
             op_klass.new(self, *others)
           end
@@ -109,6 +109,10 @@ module SymbolicComputation
         Class.new(self)
       end
 
+    end
+
+    def self.basic
+      Basic
     end
 
     def self.class(*ivars, &blk)
@@ -179,6 +183,7 @@ module SymbolicComputation
 
   Value = Generator.class(:_) do
     coerces Numeric
+
     def +(other)
       if self.class === other
         self.class.new(self._ + other._)
@@ -186,9 +191,27 @@ module SymbolicComputation
         super
       end
     end
+
+    def ==(other)
+      return _ == other if Numeric === other
+      super
+    end
   end
   Variable = Generator.class(:_)
   Operand = Generator.class(:coef, :var)
+    Operand.simplify {
+      on(Value, Variable) { |val, var|
+        if val == 0
+          puts "BRAH-0"
+          val
+        elsif val == 1
+          puts "BRAH-1"
+          var
+        else
+          puts "BRAH-#{val}#{var}"
+        end
+      }
+    }
 
   UnaryOp = Generator.class(:_1).abstract
     UnaryMinus = UnaryOp.implement.op(:-@)
@@ -201,6 +224,10 @@ module SymbolicComputation
         on_any_order(Operand, Variable) { |o, v| Operand.new(o.coef + Value.new(1), o.var) if o.var == v }
       }
     Subtract = BinaryOp.implement.op(:-)
+      Subtract.simplify {
+        on(Variable, Variable) { |v1, v2| Value.new(0) if v1 == v2 }
+        on_any_order(Operand, Variable) { |o, v| Operand.new(o.coef + Value.new(-1), o.var) if o.var == v }
+      }
     Multiply = BinaryOp.implement.op(:*)
       Multiply.simplify {
         on_any_order(Numeric, Variable) { |coef, var| Operand.new(Value.new(coef), var) }
