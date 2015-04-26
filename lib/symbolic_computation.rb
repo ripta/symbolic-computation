@@ -198,17 +198,23 @@ module SymbolicComputation
     end
   end
   Variable = Generator.class(:_)
-  Operand = Generator.class(:coef, :var)
+  Operand = Generator.class(:coef, :var) do
+    def +(other)
+      if self.class === other && self.var == other.var
+        self.class.new(self.coef + other.coef, self.var)
+      else
+        super
+      end
+    end
+  end
     Operand.simplify {
       on(Value, Variable) { |val, var|
         if val == 0
-          puts "BRAH-0"
           val
         elsif val == 1
-          puts "BRAH-1"
           var
         else
-          puts "BRAH-#{val}#{var}"
+          # noop
         end
       }
     }
@@ -219,9 +225,12 @@ module SymbolicComputation
   BinaryOp = Generator.class(:_1, :_2).abstract
     Add = BinaryOp.implement.op(:+)
       Add.simplify {
-        on(Operand, Operand) { |o1, o2| Operand.new(o1.coef + o2.coef, o1.var) if o1.var == o2.var }
+        # 2x + 3x => 5x
+        on(Operand, Operand) { |o1, o2| o1 + o2 if o1.var == o2.var }
+        # x + x => 2x
         on(Variable, Variable) { |v1, v2| 2 * v1 if v1 == v2 }
-        on_any_order(Operand, Variable) { |o, v| Operand.new(o.coef + Value.new(1), o.var) if o.var == v }
+        # 2x + x => 3x
+        on_any_order(Operand, Variable) { |o, v| o.succ if o.var == v }
       }
     Subtract = BinaryOp.implement.op(:-)
       Subtract.simplify {
