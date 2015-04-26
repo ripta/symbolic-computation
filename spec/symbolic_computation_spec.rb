@@ -72,6 +72,12 @@ RSpec.describe SymbolicComputation do
       it { is_expected.to eq(expr) }
     end
 
+    context '5 * x - x' do
+      simplify { 5 * x - x }
+      expr { Operand.new(Value.new(4), Variable.new(:x)) }
+      it { is_expected.to eq(expr) }
+    end
+
     context '2 * x - x - x' do
       simplify { 2 * x - x - x }
       expr { Value.new(0) }
