@@ -12,9 +12,16 @@ module ContextHelper
   end
 end
 
+module TestHelper
+  # SymbolicComputation.constants.each do |const|
+  #   self.const_set(const, SymbolicComputation.const_get(const))
+  # end
+end
+
 RSpec.configure do |c|
 
   c.extend ContextHelper
+  c.include TestHelper
 
   c.fail_fast = false
 
