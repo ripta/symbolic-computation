@@ -1,7 +1,9 @@
-RSpec.describe SymbolicComputation do
+RSpec.describe SymbolicComputation::Expression do
 
   Add      = SymbolicComputation::Add
+  Multiply = SymbolicComputation::Multiply
   Operand  = SymbolicComputation::Operand
+  Subtract = SymbolicComputation::Subtract
   Value    = SymbolicComputation::Value
   Variable = SymbolicComputation::Variable
 
@@ -47,6 +49,34 @@ RSpec.describe SymbolicComputation do
       context 'x + y' do
         parsing { x + y }
         expr { Add.new(Variable.new(:x), Variable.new(:y)) }
+        it { is_expected.to eq(expr) }
+      end
+    end
+
+    context 'Subtract' do
+      context '5 - 2' do
+        parsing { 5 - 2 }
+        expr { 3 }
+        it { is_expected.to eq(expr) }
+      end
+
+      context 'x - x' do
+        parsing { x - x }
+        expr { Subtract.new(Variable.new(:x), Variable.new(:x)) }
+        it { is_expected.to eq(expr) }
+      end
+    end
+
+    context 'Multiply' do
+      context '9 * 6' do
+        parsing { 9 * 6 }
+        expr { 54 }
+        it { is_expected.to eq(expr) }
+      end
+
+      context '9 * x' do
+        parsing { 9 * x }
+        expr { Multiply.new(Value.new(9), Variable.new(:x)) }
         it { is_expected.to eq(expr) }
       end
     end
