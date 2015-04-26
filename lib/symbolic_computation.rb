@@ -260,10 +260,9 @@ module SymbolicComputation
     Subtract = BinaryOp.implement do
       op :-
       simplify {
-        # x - x => 0
-        on(Variable, Variable) { |v1, v2| 0 if v1 == v2 }
-        # 3x - x => 2x
-        on_any_order(Operand, Variable) { |o, v| o.pred if o.var == v }
+        on(Any, Variable) { |a, v| puts "(Any, Variable)"; a + (-v) }
+        on(Any, Numeric) { |a, n| puts "(Any, Numeric)"; a + (-n) }
+        on(Any, Value) { |a, v| puts "(Any, Value)"; a + (-v) }
       }
     end
     Multiply = BinaryOp.implement do
