@@ -232,8 +232,9 @@ module SymbolicComputation
     UnaryMinus = UnaryOp.implement.op(:-@)
 
   BinaryOp = Generator.class(:_1, :_2).abstract
-    Add = BinaryOp.implement.op(:+)
-      Add.simplify {
+    Add = BinaryOp.implement do
+      op :+
+      simplify {
         # 2x + 3x => 5x
         on(Operand, Operand) { |o1, o2| o1 + o2 if o1.var == o2.var }
         # x + x => 2x
@@ -241,16 +242,23 @@ module SymbolicComputation
         # 2x + x => 3x
         on_any_order(Operand, Variable) { |o, v| o.succ if o.var == v }
       }
-    Subtract = BinaryOp.implement.op(:-)
-      Subtract.simplify {
-        on(Variable, Variable) { |v1, v2| Value.new(0) if v1 == v2 }
-        on_any_order(Operand, Variable) { |o, v| Operand.new(o.coef + Value.new(-1), o.var) if o.var == v }
+    end
+    Subtract = BinaryOp.implement do
+      op :-
+      simplify {
+        # x - x => 0
+        on(Variable, Variable) { |v1, v2| 0 if v1 == v2 }
+        # 3x - x => 2x
+        on_any_order(Operand, Variable) { |o, v| o.pred if o.var == v }
       }
-    Multiply = BinaryOp.implement.op(:*)
-      Multiply.simplify {
+    end
+    Multiply = BinaryOp.implement do
+      op :*
+      simplify {
         on_any_order(Numeric, Variable) { |coef, var| Operand.new(Value.new(coef), var) }
         on_any_order(Value, Variable)   { |coef, var| Operand.new(coef, var) }
       }
+    end
     Divide = BinaryOp.implement.op(:/)
 
 end
