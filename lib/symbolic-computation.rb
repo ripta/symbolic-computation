@@ -27,11 +27,11 @@ module SymbolicComputation
       end
     end
 
-    def match(*types, &blk)
+    def on(*types, &blk)
       set(types, 0.upto(types.size - 1).to_a, blk)
     end
 
-    def permute(*types, &blk)
+    def on_any_order(*types, &blk)
       idx_orders = 0.upto(types.size - 1).to_a.permutation(types.size)
       idx_orders.each do |idx_order|
         type_order = idx_order.map { |idx| types[idx] }
@@ -194,10 +194,10 @@ module SymbolicComputation
     Add = BinaryOp.implement.op(:+)
     Subtract = BinaryOp.implement.op(:-)
     Multiply = BinaryOp.implement.op(:*)
-      Multiply.simplify do
-        permute(Numeric, Variable) { |coef, var| Operand.new(Value.new(coef), var) }
-        permute(Value, Variable)   { |coef, var| Operand.new(coef, var) }
-      end
+      Multiply.simplify {
+        on_any_order(Numeric, Variable) { |coef, var| Operand.new(Value.new(coef), var) }
+        on_any_order(Value, Variable)   { |coef, var| Operand.new(coef, var) }
+      }
     Divide = BinaryOp.implement.op(:/)
 
 end
