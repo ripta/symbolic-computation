@@ -149,6 +149,23 @@ RSpec.describe SymbolicComputation do
       it_parses_and_validates
     end
 
+    context 'x ** x' do
+      simplify { x ** x }
+      expr { Power.new(Variable.new(:x), Variable.new(:x)) }
+      it_parses_and_validates
+    end
+
+    context 'x ** 2 * y' do
+      simplify { x ** 2 * x }
+      expr { Multiply.new(Power.new(Variable.new(:x), Value.new(2)), Variable.new(:x)) }
+    end
+
+    context 'x ** (2 * y)' do
+      simplify { x ** (2 * x) }
+      expr { Power.new(Variable.new(:x), Operand.new(Value.new(2), Variable.new(:x))) }
+      it_parses_and_validates
+    end
+
   end
 
 end
