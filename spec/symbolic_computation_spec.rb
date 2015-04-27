@@ -2,7 +2,7 @@ RSpec.describe SymbolicComputation do
 
   Add      = SymbolicComputation::AST::Add
   Multiply = SymbolicComputation::AST::Multiply
-  Operand  = SymbolicComputation::AST::Operand
+  Term  = SymbolicComputation::AST::Term
   Power    = SymbolicComputation::AST::Power
   Subtract = SymbolicComputation::AST::Subtract
   Value    = SymbolicComputation::AST::Value
@@ -103,7 +103,7 @@ RSpec.describe SymbolicComputation do
   describe '#Simplify' do
     context 'x + x' do
       simplify { x + x }
-      expr { Operand.new(Value.new(2), Variable.new(:x)) }
+      expr { Term.new(Value.new(2), Variable.new(:x)) }
       it_parses_and_validates
     end
 
@@ -115,13 +115,13 @@ RSpec.describe SymbolicComputation do
 
     context '2 * x + 3 * x' do
       simplify { 2 * x + 3 * x }
-      expr { Operand.new(Value.new(5), Variable.new(:x)) }
+      expr { Term.new(Value.new(5), Variable.new(:x)) }
       it_parses_and_validates
     end
 
     context '3 * x + 5 * y' do
       simplify { 3 * x + 5 * y }
-      expr { Add.new(Operand.new(Value.new(3), Variable.new(:x)), Operand.new(Value.new(5), Variable.new(:y))) }
+      expr { Add.new(Term.new(Value.new(3), Variable.new(:x)), Term.new(Value.new(5), Variable.new(:y))) }
       it_parses_and_validates
     end
 
@@ -133,7 +133,7 @@ RSpec.describe SymbolicComputation do
 
     context '5 * x - x' do
       simplify { 5 * x - x }
-      expr { Operand.new(Value.new(4), Variable.new(:x)) }
+      expr { Term.new(Value.new(4), Variable.new(:x)) }
       it_parses_and_validates
     end
 
@@ -168,7 +168,7 @@ RSpec.describe SymbolicComputation do
 
     context 'x ** (2 * y)' do
       simplify { x ** (2 * x) }
-      expr { Power.new(Variable.new(:x), Operand.new(Value.new(2), Variable.new(:x))) }
+      expr { Power.new(Variable.new(:x), Term.new(Value.new(2), Variable.new(:x))) }
       it_parses_and_validates
     end
 
@@ -180,7 +180,7 @@ RSpec.describe SymbolicComputation do
 
     context '2 * x / y' do
       simplify { 2 * x / y }
-      expr { Multiply.new(Operand.new(Value.new(2), Variable.new(:x)), Power.new(Variable.new(:y), Value.new(-1))) }
+      expr { Multiply.new(Term.new(Value.new(2), Variable.new(:x)), Power.new(Variable.new(:y), Value.new(-1))) }
       it_parses_and_validates
     end
 

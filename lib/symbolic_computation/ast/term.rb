@@ -1,7 +1,7 @@
 module SymbolicComputation
   module AST
 
-    class Operand < Generator.class(:coef, :var)
+    class Term < Generator.class(:coef, :var)
 
       simplify {
         on(Value, Variable) { |val, var|
