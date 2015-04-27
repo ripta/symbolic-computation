@@ -44,9 +44,11 @@ module SymbolicComputation
 
         def op(operator)
           op_klass = self
+
           if Basic.instance_methods.include?(operator)
             raise ArgumentError, "Cannot allow #{op_klass} to operate on #{operator.inspect}, because it is already claimed"
           end
+
           Basic.send(:define_method, operator) do |*others|
             #puts "Basic##{op}"
             # puts "#{self.class} #{op_klass} #{others.first.inspect}"
