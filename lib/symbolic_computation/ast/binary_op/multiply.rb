@@ -4,7 +4,10 @@ module SymbolicComputation
     class Multiply < BinaryOp.implement
 
       op :*
-      simplify.on_any_order(Value, Variable) { |coef, var| Operand.new(coef, var) }
+      simplify {
+        on(Variable, Variable) { |v1, v2| v1 ** 2 if v1 == v2 }
+        on_any_order(Value, Variable) { |coef, var| Operand.new(coef, var) }
+      }
 
     end
 
