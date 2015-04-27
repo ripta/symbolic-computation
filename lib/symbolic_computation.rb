@@ -57,8 +57,29 @@ module SymbolicComputation
     Basic = Class.new do
       class <<self
 
+        define_method(:coerce) do |value|
+          coerced_type = coercer_registry.keys.find do |type|
+            # puts "#{value.inspect}.kind_of?(#{type.inspect})"
+            value.kind_of?(type)
+          end
+          if coerced_type.nil?
+            # warn "Cannot coerce #{value.inspect}"
+            value
+          else
+            coercer = coercer_registry[coerced_type]
+            self == coercer ? value : coercer.new(value)
+          end
+        end
+
+        define_method(:coercer_registry) do
+          @@coercer_registry ||= { }
+        end
+
         define_method(:coerces) do |*target_klasses|
           coercion_klass = self
+          target_klasses.each do |target_klass|
+            coercion_klass.coercer_registry[target_klass] = coercion_klass
+          end
           Basic.send(:define_method, :coerce) do |other|
             case other
             when *target_klasses
@@ -128,7 +149,7 @@ module SymbolicComputation
         # def initialize(*_)
         define_method(:initialize) do |*_|
           ivars.each_with_index do |ivar, idx|
-            instance_variable_set("@#{ivar}", _[idx])
+            instance_variable_set("@#{ivar}", self.class.coerce(_[idx]))
           end
         end
 
