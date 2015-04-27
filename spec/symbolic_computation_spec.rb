@@ -172,6 +172,18 @@ RSpec.describe SymbolicComputation do
       it_parses_and_validates
     end
 
+    context '1 / x' do
+      simplify { 1 / x }
+      expr { Multiply.new(Value.new(1), Power.new(Variable.new(:x), Value.new(-1))) }
+      it_parses_and_validates
+    end
+
+    context '2 * x / y' do
+      simplify { 2 * x / y }
+      expr { Multiply.new(Operand.new(Value.new(2), Variable.new(:x)), Power.new(Variable.new(:y), Value.new(-1))) }
+      it_parses_and_validates
+    end
+
   end
 
 end
