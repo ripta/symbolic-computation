@@ -18,7 +18,7 @@ module SymbolicComputation
       end
 
       def ==(other)
-        return _ == other if Numeric === other
+        return _ == other if _.class === other
         super
       end
 
