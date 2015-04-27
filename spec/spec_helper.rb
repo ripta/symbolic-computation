@@ -3,7 +3,7 @@ require_relative '../lib/symbolic_computation'
 module ContextHelper
 
   def expr(&blk)
-    let(:expr) { SymbolicComputation::Expression.new(blk.call) }
+    let(:expr) { SymbolicComputation::AST::Expression.new(blk.call) }
   end
 
   def it_parses_and_validates

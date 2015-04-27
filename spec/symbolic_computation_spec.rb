@@ -1,11 +1,11 @@
-RSpec.describe SymbolicComputation::Expression do
+RSpec.describe SymbolicComputation do
 
-  Add      = SymbolicComputation::Add
-  Multiply = SymbolicComputation::Multiply
-  Operand  = SymbolicComputation::Operand
-  Subtract = SymbolicComputation::Subtract
-  Value    = SymbolicComputation::Value
-  Variable = SymbolicComputation::Variable
+  Add      = SymbolicComputation::AST::Add
+  Multiply = SymbolicComputation::AST::Multiply
+  Operand  = SymbolicComputation::AST::Operand
+  Subtract = SymbolicComputation::AST::Subtract
+  Value    = SymbolicComputation::AST::Value
+  Variable = SymbolicComputation::AST::Variable
 
   describe '#==' do
     context 'Value(5)' do

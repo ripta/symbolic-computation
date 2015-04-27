@@ -4,11 +4,11 @@ module SymbolicComputation
     class <<self
 
       def instance_eval(&blk)
-        Expression.new super
+        AST::Expression.new super
       end
 
       def method_missing(name, *args, &blk)
-        Variable.new(name)
+        AST::Variable.new(name)
       end
 
     end
