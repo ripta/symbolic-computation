@@ -5,6 +5,7 @@ module SymbolicComputation
 
       op :**
       simplify {
+        on(Value, Value) { |v1, v2| v1 ** v2 }
         on(Variable, Value) { |var, val| 1 if val == 0 }
       }
 
