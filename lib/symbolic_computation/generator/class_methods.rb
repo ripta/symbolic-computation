@@ -1,5 +1,5 @@
 module SymbolicComputation
-  class Generator
+  module Generator
 
     ClassMethods = Module.new do
 

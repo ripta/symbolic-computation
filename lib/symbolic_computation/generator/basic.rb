@@ -1,5 +1,5 @@
 module SymbolicComputation
-  class Generator
+  module Generator
 
     Basic = Class.new do
       class <<self

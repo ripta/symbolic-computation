@@ -2,7 +2,7 @@ require_relative 'generator/basic'
 require_relative 'generator/class_methods'
 
 module SymbolicComputation
-  class Generator
+  module Generator
 
     def self.basic
       Basic
