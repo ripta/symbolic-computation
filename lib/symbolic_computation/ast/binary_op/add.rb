@@ -9,6 +9,7 @@ module SymbolicComputation
         on(Term, Term) { |o1, o2| o1 + o2 if o1.var == o2.var }
         # x + x => 2x
         on(Variable, Variable) { |v1, v2| 2 * v1 if v1 == v2 }
+        on(Value, Value) { |v1, v2| v1 + v2 }
         # 2x + x => 3x
         on_any_order(Term, Variable) { |o, v| o.succ if o.var == v }
       }
