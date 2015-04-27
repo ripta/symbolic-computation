@@ -7,6 +7,22 @@ RSpec.describe SymbolicComputation::Expression do
   Value    = SymbolicComputation::Value
   Variable = SymbolicComputation::Variable
 
+  describe '#==' do
+    context 'Value(5)' do
+      subject { Value.new(5) }
+      it { is_expected.to eq(5) }
+      it { is_expected.to eq(Value.new(5)) }
+    end
+  end
+
+  describe '#eql?' do
+    context 'Value(5)' do
+      subject { Value.new(5) }
+      it { is_expected.not_to eql(5) }
+      it { is_expected.to eql(Value.new(5)) }
+    end
+  end
+
   describe '#Parse' do
 
     context '5' do
