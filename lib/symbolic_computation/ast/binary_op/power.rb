@@ -7,12 +7,13 @@ module SymbolicComputation
       simplify {
         on(Value, Value) { |v1, v2| v1 ** v2 }
         on(Variable, Value) { |var, val| 1 if val == 0 }
+        on(Power, Value) { |p, v| p ** v }
       }
 
       def *(other)
         if self.class === other && self._1 == other._1
           self.class.new(self._1, self._2 + other._2)
-        elsif self._1.class === other && self._1 == other
+        elsif self._1.class === other && self._1 == other # FIXME, assumptions of Val vs Var for _1
           self.class.new(self._1, self._2 + 1)
         else
           super
