@@ -18,6 +18,10 @@ module SymbolicComputation
         end
       end
 
+      def like?(other)
+        (super && self._1 == other._1) || self._1.like?(other)
+      end
+
     end
 
   end
