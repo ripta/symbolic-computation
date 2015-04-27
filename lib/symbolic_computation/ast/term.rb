@@ -31,14 +31,6 @@ module SymbolicComputation
         (super && self.var == other.var) || self.var.like?(other)
       end
 
-      def pred
-        self.class.new(coef + -1, var)
-      end
-
-      def succ
-        self.class.new(coef + 1, var)
-      end
-
     end
 
   end
