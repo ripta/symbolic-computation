@@ -190,6 +190,12 @@ RSpec.describe SymbolicComputation do
       it_parses_and_validates
     end
 
+    context '(3 + x) / 2' do
+      simplify { (3 + x) / 2 }
+      expr { Add.new(Value.new(1.5), Term.new(Value.new(0.5), Variable.new(:x))) }
+      it_parses_and_validates
+    end
+
     # context '6 / x / x' do
     #   simplify { 6 / x / x }
     #   expr {  }
