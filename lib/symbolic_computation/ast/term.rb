@@ -28,7 +28,7 @@ module SymbolicComputation
       end
 
       def like?(other)
-        super && self.var == other.var
+        (super && self.var == other.var) || self.var.like?(other)
       end
 
       def pred

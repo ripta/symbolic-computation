@@ -11,7 +11,7 @@ module SymbolicComputation
         on(Variable, Variable) { |v1, v2| 2 * v1 if v1.like?(v2) }
         on(Value, Value) { |v1, v2| v1 + v2 }
         # 2x + x => 3x
-        on_any_order(Term, Variable) { |o, v| o.succ if o.var == v }
+        on_any_order(Term, Variable) { |o, v| o.succ if o.like?(v) }
       }
 
     end
