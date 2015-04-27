@@ -1,7 +1,8 @@
 module SymbolicComputation
   module AST
 
-    Operand = Generator.class(:coef, :var) do
+    class Operand < Generator.class(:coef, :var)
+
       simplify {
         on(Value, Variable) { |val, var|
           if val == 0
@@ -33,6 +34,7 @@ module SymbolicComputation
       def succ
         self.class.new(coef + Value.new(1), var)
       end
+
     end
 
   end

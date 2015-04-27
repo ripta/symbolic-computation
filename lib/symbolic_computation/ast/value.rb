@@ -1,7 +1,8 @@
 module SymbolicComputation
   module AST
 
-    Value = Generator.class(:_) do
+    class Value < Generator.class(:_)
+
       coerces Numeric
 
       def -@
@@ -20,6 +21,7 @@ module SymbolicComputation
         return _ == other if Numeric === other
         super
       end
+
     end
 
   end

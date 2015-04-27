@@ -1,10 +1,12 @@
 module SymbolicComputation
   module AST
 
-    Variable = Generator.class(:_) do
+    class Variable < Generator.class(:_)
+
       def -@
         -1 * self
       end
+
     end
 
   end

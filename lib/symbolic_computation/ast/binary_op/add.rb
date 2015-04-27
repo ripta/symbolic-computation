@@ -1,7 +1,8 @@
 module SymbolicComputation
   module AST
 
-    Add = BinaryOp.implement do
+    class Add < BinaryOp.implement
+
       op :+
       simplify {
         # 2x + 3x => 5x
@@ -11,6 +12,7 @@ module SymbolicComputation
         # 2x + x => 3x
         on_any_order(Operand, Variable) { |o, v| o.succ if o.var == v }
       }
+
     end
 
   end

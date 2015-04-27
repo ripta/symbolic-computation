@@ -56,8 +56,10 @@ module SymbolicComputation
       end
 
       if blk.nil?
+        # called on NewClass = Generator.class do ... end
         klass
       else
+        # called on class NewClass < Generator.class ... end
         Class.new(klass).tap { |k| k.class_eval(&blk) }
       end
     end
