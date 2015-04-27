@@ -1,7 +1,9 @@
 module SymbolicComputation
   module AST
 
-    Divide = BinaryOp.implement.op(:/)
+    class Divide < BinaryOp.implement
+      op :/
+    end
 
   end
 end
