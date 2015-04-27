@@ -7,6 +7,10 @@ module SymbolicComputation
         -1 * self
       end
 
+      def like?(other)
+        super && self._ == other._
+      end
+
     end
 
   end

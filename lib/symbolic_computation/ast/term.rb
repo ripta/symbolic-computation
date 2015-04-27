@@ -27,6 +27,10 @@ module SymbolicComputation
         end
       end
 
+      def like?(other)
+        super && self.var == other.var
+      end
+
       def pred
         self.class.new(coef + -1, var)
       end

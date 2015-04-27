@@ -45,6 +45,11 @@ module SymbolicComputation
           "#{self.class.name.split(/::/).last}(#{inspected_ivars})"
         end
 
+        # def like?(other)
+        define_method(:like?) do |other|
+          self.class === other
+        end
+
         define_method(:simplify) do
           ivar_simplifieds = ivars.map do |ivar|
             val = __send__(ivar)
