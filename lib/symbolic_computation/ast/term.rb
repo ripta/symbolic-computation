@@ -28,11 +28,11 @@ module SymbolicComputation
       end
 
       def pred
-        self.class.new(coef + Value.new(-1), var)
+        self.class.new(coef + -1, var)
       end
 
       def succ
-        self.class.new(coef + Value.new(1), var)
+        self.class.new(coef + 1, var)
       end
 
     end
