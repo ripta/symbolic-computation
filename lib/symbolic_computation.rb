@@ -80,6 +80,9 @@ module SymbolicComputation
           target_klasses.each do |target_klass|
             coercion_klass.coercer_registry[target_klass] = coercion_klass
           end
+
+          # FIXME: this should be defined on the subklass instead, but there are resolution problems
+          # coercion_klass.send(:define_method, :coerce) do |other|
           Basic.send(:define_method, :coerce) do |other|
             case other
             when *target_klasses
