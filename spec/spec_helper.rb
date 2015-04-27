@@ -1,15 +1,26 @@
 require_relative '../lib/symbolic_computation'
 
 module ContextHelper
+
   def expr(&blk)
     let(:expr) { SymbolicComputation::Expression.new(blk.call) }
   end
+
+  def it_parses_and_validates
+    it do
+      expect { subject }.not_to raise_exception
+      expect(subject).to eql(expr)
+    end
+  end
+
   def parsing(&blk)
     subject { Parse(&blk) }
   end
+
   def simplify(&blk)
     subject { Simplify(Parse(&blk)) }
   end
+
 end
 
 module TestHelper
