@@ -149,6 +149,14 @@ module SymbolicComputation
           end
         end
 
+        define_method(:eql?) do |other|
+          if self.class == other.class
+            ivars.all? { |ivar| send(ivar).eql? other.send(ivar) }
+          else
+            false
+          end
+        end
+
         # def initialize(*_)
         define_method(:initialize) do |*_|
           ivars.each_with_index do |ivar, idx|
