@@ -1,10 +1,10 @@
 module SymbolicComputation
   module Generator
 
-    Basic = Class.new do
+    class Basic
       class <<self
 
-        define_method(:coerce) do |value|
+        def coerce(value)
           coerced_type = coercer_registry.keys.find do |type|
             # puts "#{value.inspect}.kind_of?(#{type.inspect})"
             value.kind_of?(type)
@@ -18,12 +18,13 @@ module SymbolicComputation
           end
         end
 
-        define_method(:coercer_registry) do
+        def coercer_registry
           @@coercer_registry ||= { }
         end
 
-        define_method(:coerces) do |*target_klasses|
+        def coerces(*target_klasses)
           coercion_klass = self
+
           target_klasses.each do |target_klass|
             coercion_klass.coercer_registry[target_klass] = coercion_klass
           end
@@ -41,20 +42,21 @@ module SymbolicComputation
           self
         end
 
-        define_method(:op) do |op|
+        def op(operator)
           op_klass = self
-          if Basic.instance_methods.include?(op)
-            raise ArgumentError, "Cannot allow #{op_klass} to operate on #{op.inspect}, because it is already claimed"
+          if Basic.instance_methods.include?(operator)
+            raise ArgumentError, "Cannot allow #{op_klass} to operate on #{operator.inspect}, because it is already claimed"
           end
-          Basic.send(:define_method, op) do |*others|
+          Basic.send(:define_method, operator) do |*others|
             #puts "Basic##{op}"
             # puts "#{self.class} #{op_klass} #{others.first.inspect}"
             op_klass.new(self, *others)
           end
+
           self
         end
 
-        define_method(:simplify) do |&blk|
+        def simplify(&blk)
           @__simplifier__ ||= Simplifier.new
           blk.nil? ? @__simplifier__ : @__simplifier__.instance_eval(&blk)
         end
