@@ -1,15 +1,13 @@
 module SymbolicComputation
   module Generator
 
-    ClassMethods = Module.new do
+    module ClassMethods
 
-      # def klass.abstract
-      define_method(:abstract) do
+      def abstract
         self
       end
 
-      # def klass.implement
-      define_method(:implement) do |&blk|
+      def implement(&blk)
         Class.new(self).tap { |k| k.class_eval(&blk) unless blk.nil? }
       end
 
