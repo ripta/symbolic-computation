@@ -3,6 +3,7 @@ RSpec.describe SymbolicComputation do
   Add      = SymbolicComputation::AST::Add
   Multiply = SymbolicComputation::AST::Multiply
   Operand  = SymbolicComputation::AST::Operand
+  Power    = SymbolicComputation::AST::Power
   Subtract = SymbolicComputation::AST::Subtract
   Value    = SymbolicComputation::AST::Value
   Variable = SymbolicComputation::AST::Variable
@@ -141,6 +142,13 @@ RSpec.describe SymbolicComputation do
       expr { Value.new(0) }
       it_parses_and_validates
     end
+
+    context 'x ** 3' do
+      simplify { x ** 3 }
+      expr { Power.new(Variable.new(:x), Value.new(3)) }
+      it_parses_and_validates
+    end
+
   end
 
 end
