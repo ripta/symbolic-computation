@@ -106,9 +106,21 @@ RSpec.describe SymbolicComputation do
       it_parses_and_validates
     end
 
+    context 'x + y' do
+      simplify { x + y }
+      expr { Add.new(Variable.new(:x), Variable.new(:y)) }
+      it_parses_and_validates
+    end
+
     context '2 * x + 3 * x' do
       simplify { 2 * x + 3 * x }
       expr { Operand.new(Value.new(5), Variable.new(:x)) }
+      it_parses_and_validates
+    end
+
+    context '3 * x + 5 * y' do
+      simplify { 3 * x + 5 * y }
+      expr { Add.new(Operand.new(Value.new(3), Variable.new(:x)), Operand.new(Value.new(5), Variable.new(:y))) }
       it_parses_and_validates
     end
 
